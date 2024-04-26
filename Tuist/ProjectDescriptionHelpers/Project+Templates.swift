@@ -1,5 +1,17 @@
 import ProjectDescription
 
+public enum ProjectDeployTarget: String {
+    case dev = "DEV"
+    case stage = "STAGE"
+    case prod = "PROD"
+}
+
+public extension ConfigurationName {
+    static var dev: ConfigurationName { configuration(ProjectDeployTarget.dev.rawValue) }
+    static var stage: ConfigurationName { configuration(ProjectDeployTarget.stage.rawValue) }
+    static var prod: ConfigurationName { configuration(ProjectDeployTarget.prod.rawValue) }
+}
+
 public extension Project {
     static func makeModule(
         name: String,
@@ -16,8 +28,9 @@ public extension Project {
         let settings: Settings = .settings(
             base: [:],
             configurations: [
-                .debug(name: .debug),
-                .release(name: .release)
+                .debug(name: .dev, xcconfig: .relativeToRoot("")),
+                .debug(name: .stage),
+                .release(name: .prod)
             ], defaultSettings: .recommended)
         
         let appTarget = Target(
@@ -29,7 +42,7 @@ public extension Project {
             infoPlist: infoPlist,
             sources: sources,
             resources: resources,
-            scripts: [.SwiftLintShell],
+            scripts: [.SwiftLintShell], // 4. 빌드 스크립트 추가 (sh)
             dependencies: dependencies
         )
         
