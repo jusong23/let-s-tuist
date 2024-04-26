@@ -1,17 +1,5 @@
 import ProjectDescription
 
-public enum ProjectDeployTarget: String {
-    case dev = "DEV"
-    case stage = "STAGE"
-    case prod = "PROD"
-}
-
-public extension ConfigurationName {
-    static var dev: ConfigurationName { configuration(ProjectDeployTarget.dev.rawValue) }
-    static var stage: ConfigurationName { configuration(ProjectDeployTarget.stage.rawValue) }
-    static var prod: ConfigurationName { configuration(ProjectDeployTarget.prod.rawValue) }
-}
-
 public extension Project {
     static func makeModule(
         name: String,
@@ -28,7 +16,7 @@ public extension Project {
         let settings: Settings = .settings(
             base: [:],
             configurations: [
-                .debug(name: .dev, xcconfig: .relativeToRoot("")),
+                .debug(name: .dev),
                 .debug(name: .stage),
                 .release(name: .prod)
             ], defaultSettings: .recommended)
@@ -57,7 +45,7 @@ public extension Project {
             dependencies: [.target(name: name)]
         )
         
-        let schemes: [Scheme] = [.makeScheme(target: .debug, name: name)]
+        let schemes: [Scheme] = [.makeScheme(target: .dev, name: name), .makeScheme(target: .stage, name: name), .makeScheme(target: .prod, name: name)]
         
         let targets: [Target] = [appTarget, testTarget]
         
